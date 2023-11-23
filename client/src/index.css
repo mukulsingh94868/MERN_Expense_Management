@@ -14,3 +14,11 @@
   justify-content: center;
   height: 90vh;
 }
+
+.filters {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+  box-shadow: 0px 0px 3px gray;
+}

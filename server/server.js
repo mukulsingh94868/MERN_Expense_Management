@@ -5,6 +5,9 @@ const dotenv = require('dotenv');
 const colors = require('colors');
 const morgan = require('morgan');
 
+const userRoute = require('./routes/userRoutes');
+const transactionRoute = require('./routes/transactionRoutes');
+
 dotenv.config();
 const app = express();
 
@@ -14,7 +17,10 @@ app.use(express.json());
 
 app.get('/', (req, res) => {
     res.send('hello world')
-})
+});
+
+app.use('/api/v1/users', userRoute);
+app.use('/api/v1/transactions', transactionRoute);
 
 const PORT = 5000 || process.env.PORT;
 const MONGO_URL = process.env.MONGO_URL;

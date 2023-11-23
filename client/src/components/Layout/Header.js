@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 import { message } from "antd";
 
@@ -7,7 +7,15 @@ const Header = () => {
   const [loginUser, setLoginUser] = useState("");
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user) {
+      setLoginUser(user);
+    }
+  }, []);
+
   const logoutHandler = () => {
+    localStorage.removeItem("user");
     message.success("Logout Successfully");
     navigate("/login");
   };
