@@ -1,25 +1,73 @@
 const transectionModel = require('../models/transactionModel');
+const moment = require('moment');
 
 const getTransactions = async (req, res) => {
     try {
-        const newTransaction = await transectionModel.find({ userid: req.body.userid });
-        res.status(200).json(newTransaction);
+        const { frequency, selectedDate, type } = req.body;
+        const transections = await transectionModel.find({
+            ...(frequency !== "custom"
+                ? {
+                    date: {
+                        $gt: moment().subtract(Number(frequency), "d").toDate(),
+                    },
+                }
+                : {
+                    date: {
+                        $gte: selectedDate[0],
+                        $lte: selectedDate[1],
+                    },
+                }),
+            userid: req.body.userid,
+            ...(type !== "all" && { type }),
+        });
+        res.status(200).json(transections);
     } catch (error) {
-        res.status(404).json({ success: false, error });
+        console.log(error);
+        res.status(500).json(error);
     }
 };
 
 const addTransaction = async (req, res) => {
     try {
-        const newTransaction = new transectionModel(req.body);
-        const savedTransaction = await newTransaction.save();
-        res.status(200).send("Transation Created");
+        // const newTransection = new transectionModel(req.body);
+        const newTransection = new transectionModel(req.body);
+        await newTransection.save();
+        res.status(201).send("Transection Created");
     } catch (error) {
-        res.status(404).json({ success: false, error });
+        console.log(error);
+        res.status(500).json(error);
     }
 };
 
+const editTransection = async (req, res) => {
+    try {
+        const transacationId = req.params.id;
+        const newData = await transectionModel.findByIdAndUpdate(transacationId, req.body.payload, { new: true });
+        // await transectionModel.findOneAndUpdate(
+        //     { _id: req.body.transacationId },
+        //     req.body.payload
+        // );
+        res.status(200).send({ data: newData, message: 'Transection updated successfully' });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json(error);
+    }
+};
+
+const deleteTransection = async (req, res) => {
+    try {
+        const transacationId = req.params.id;
+        // await transectionModel.findOneAndDelete({ _id: req.body.transacationId });
+        await transectionModel.findOneAndDelete(transacationId);
+        res.status(200).send("Transaction Deleted!");
+    } catch (error) {
+        console.log(error);
+        res.status(500).json(error);
+    }
+};
 module.exports = {
     getTransactions,
-    addTransaction
+    addTransaction,
+    editTransection,
+    deleteTransection
 }
